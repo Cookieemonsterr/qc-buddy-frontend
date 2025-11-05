@@ -1,10 +1,13 @@
 // src/App.jsx
 import React, { useEffect, useRef, useState } from "react";
-import ChatMessage from "./components/ChatMessage.jsx";
-import SourcePanel from "./components/SourcePanel.jsx";
-import FileUploadBox from "./components/FileUploadBox.jsx";
-import BatchResultsPanel from "./components/BatchResultsPanel.jsx";
-import TagSuggestor from "./components/TagSuggestor.jsx";
+import ChatMessage from "./ChatMessage.jsx";
+import InputBar from "./InputBar.jsx";
+import FileUploadBox from "./FileUploadBox.jsx";
+import MarketSelector from "./MarketSelector.jsx";
+import SourcePanel from "./SourcePanel.jsx";
+import TagSuggestor from "./TagSuggestor.jsx";
+import BatchResultsPanel from "./BatchResultsPanel.jsx";
+
 
 export default function App() {
   // --- state ---
@@ -208,5 +211,6 @@ export default function App() {
     </div>
   );
 }
+
 
 
