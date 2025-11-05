@@ -32,7 +32,7 @@ export default function App() {
 
   // --- helpers ---
   async function sendToBackendAsk(msg, marketValue) {
-    const res = await fetch("http://localhost:3001/ask", {
+    const res = await fetch("https://qc-buddy-backend.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: msg, market: marketValue }),
@@ -208,3 +208,4 @@ export default function App() {
     </div>
   );
 }
+
