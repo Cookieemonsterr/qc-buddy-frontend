@@ -13,7 +13,7 @@ export default function FileUploadBox({ market, onResults }) {
     fd.append("market", market);
 
     try {
-      const res = await fetch("http://localhost:3001/fix-file", { method:"POST", body: fd });
+      const res = await fetch("https://qc-buddy-backend.onrender.com/", { method:"POST", body: fd });
       const data = await res.json();
       if (data.error) setStatus("⚠ " + data.error);
       else {
@@ -38,3 +38,4 @@ export default function FileUploadBox({ market, onResults }) {
     </div>
   );
 }
+
