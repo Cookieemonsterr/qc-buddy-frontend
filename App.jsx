@@ -1,5 +1,5 @@
-// src/App.jsx
-import React, { useEffect, useRef, useState } from "react";
+// App.jsx
+import React, { useRef, useState } from "react";
 import ChatMessage from "./ChatMessage.jsx";
 import InputBar from "./InputBar.jsx";
 import FileUploadBox from "./FileUploadBox.jsx";
@@ -8,6 +8,24 @@ import SourcePanel from "./SourcePanel.jsx";
 import TagSuggestor from "./TagSuggestor.jsx";
 import BatchResultsPanel from "./BatchResultsPanel.jsx";
 
+// ---- API base (from .env, fallback to Render) ----
+const API_BASE =
+  import.meta.env.VITE_API_URL || "https://qc-buddy-backend.onrender.com";
+
+// ---- API call helpers ----
+async function sendToBackendAsk(msg, marketValue) {
+  const res = await fetch(`${API_BASE}/chat`, {
+    // If your backend route is /api/chat, change to: `${API_BASE}/api/chat`
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg, market: marketValue }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status} ${text}`);
+  }
+  return res.json();
+}
 
 export default function App() {
   // --- state ---
@@ -33,16 +51,7 @@ export default function App() {
 
   const inputRef = useRef(null);
 
-  // --- helpers ---
-  async function sendToBackendAsk(msg, marketValue) {
-    const res = await fetch("https://qc-buddy-backend.onrender.com", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg, market: marketValue }),
-    });
-    return res.json();
-  }
-
+  // --- handlers ---
   async function onSend() {
     const val = inputRef.current?.value ?? "";
     const text = val.trim();
@@ -72,7 +81,7 @@ export default function App() {
           buddyMood: "confused",
           text:
             "I couldn’t reach the backend 😵‍💫\n" +
-            "Make sure it’s running at https://qc-buddy-backend.onrender.com/",
+            `Make sure it’s running at ${API_BASE}`,
           sources: [],
         },
       ]);
@@ -189,8 +198,10 @@ export default function App() {
                 setBatchResults(data);
                 setShowBatchPanel(true);
               }}
+              // If your FileUploadBox needs API_BASE, pass it:
+              apiBase={API_BASE}
             />
-            <TagSuggestor market={market} />
+            <TagSuggestor market={market} apiBase={API_BASE} />
           </div>
         </div>
       </div>
@@ -211,6 +222,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
