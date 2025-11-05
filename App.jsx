@@ -69,7 +69,7 @@ export default function App() {
           buddyMood: "confused",
           text:
             "I couldn’t reach the backend 😵‍💫\n" +
-            "Make sure it’s running at http://localhost:3001",
+            "Make sure it’s running at https://qc-buddy-backend.onrender.com/",
           sources: [],
         },
       ]);
@@ -208,4 +208,5 @@ export default function App() {
     </div>
   );
 }
+
 
