@@ -3,6 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  // IMPORTANT: repo name here
-  base: '/qc-buddy-frontend/',
+  base: '/qc-buddy-frontend/',   // important for GitHub Pages
 })
