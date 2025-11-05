@@ -1,5 +1,5 @@
 export default {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  content: ["./index.html", "./**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -20,3 +20,4 @@ export default {
   },
   plugins: []
 };
+
