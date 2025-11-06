@@ -1,24 +1,9 @@
+// FileUploadBox.jsx
 import React, { useRef, useState } from "react";
 
 export default function FileUploadBox({ market, onResults, apiBase }) {
-  const API_BASE = apiBase || import.meta.env.VITE_API_URL || "https://qc-buddy-backend.onrender.com";
   const ref = useRef(null);
   const [status, setStatus] = useState("");
-
-  async function tryUpload(fd) {
-    const paths = ["/bulk-qc", "/api/bulk-qc", "/upload", "/api/upload"];
-    let lastErr = null;
-    for (const p of paths) {
-      try {
-        const r = await fetch(`${API_BASE}${p}`, { method: "POST", body: fd });
-        if (r.ok) return { ok: true, data: await r.json(), url: `${API_BASE}${p}` };
-        lastErr = `HTTP ${r.status} ${await r.text().catch(()=> "")}`;
-      } catch (e) {
-        lastErr = e?.message || "Network error";
-      }
-    }
-    return { ok: false, error: lastErr };
-  }
 
   async function handle(e) {
     const file = e.target.files?.[0];
@@ -29,13 +14,17 @@ export default function FileUploadBox({ market, onResults, apiBase }) {
     fd.append("file", file);
     fd.append("market", market);
 
-    const resp = await tryUpload(fd);
-    if (resp.ok) {
-      const d = resp.data || {};
-      setStatus(`Checked ${d.totalRows ?? "?"} rows • ${d.rowsWithIssues ?? "?"} rows need fixes`);
-      onResults?.(d);
-    } else {
-      setStatus(`Upload failed: ${resp.error || "Unknown"}`);
+    try {
+      const res = await fetch(`${apiBase}/fix-file`, { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.error) setStatus("⚠ " + data.error);
+      else {
+        setStatus(`Checked ${data.totalRows} rows • ${data.rowsWithIssues} rows need fixes`);
+        onResults?.(data);
+      }
+    } catch (err) {
+      setStatus(`Network error: ${err?.message || "failed"} 😵`);
     }
   }
 
