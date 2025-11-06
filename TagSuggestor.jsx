@@ -1,38 +1,25 @@
+// TagSuggestor.jsx
 import React, { useState } from "react";
 
 export default function TagSuggestor({ market, apiBase }) {
-  const API_BASE = apiBase || import.meta.env.VITE_API_URL || "https://qc-buddy-backend.onrender.com";
   const [text, setText] = useState("");
   const [out, setOut] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  async function trySuggest(items) {
-    const paths = ["/suggest-tags", "/api/suggest-tags", "/tags/suggest", "/api/tags/suggest"];
-    let lastErr = null;
-    for (const p of paths) {
-      try {
-        const r = await fetch(`${API_BASE}${p}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items, market }),
-        });
-        if (r.ok) return { ok: true, data: await r.json(), url: `${API_BASE}${p}` };
-        lastErr = `HTTP ${r.status} ${await r.text().catch(()=> "")}`;
-      } catch (e) {
-        lastErr = e?.message || "Network error";
-      }
-    }
-    return { ok: false, error: lastErr };
-  }
 
   async function run() {
     const items = text.split("\n").map(s=>s.trim()).filter(Boolean);
     if (!items.length) return;
     setLoading(true);
     try {
-      const resp = await trySuggest(items);
-      if (resp.ok) setOut(resp.data);
-      else setOut({ cuisineTags: [], extraTags: [], reasoning: [], notes: [`Suggest failed: ${resp.error || "Unknown"}`] });
+      const res = await fetch(`${apiBase}/suggest-tags`, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ items, market }),
+      });
+      const data = await res.json();
+      setOut(data);
+    } catch (e) {
+      setOut({ cuisineTags:[], extraTags:[], reasoning:[], notes:["Network error"] });
     } finally {
       setLoading(false);
     }
@@ -54,8 +41,8 @@ export default function TagSuggestor({ market, apiBase }) {
           <div><b>Cuisine tags:</b> {out.cuisineTags?.join(", ") || "—"}</div>
           {out.extraTags?.length ? <div><b>Extra tags:</b> {out.extraTags.join(", ")}</div> : null}
           <div className="space-y-1">
-            {out.reasoning?.map((r,i)=> <div key={i}>• {r}</div>)}
-            {out.notes?.map((n,i)=> <div key={i} className="text-white/50">- {n}</div>)}
+            {(out.reasoning||[]).map((r,i)=> <div key={i}>• {r}</div>)}
+            {(out.notes||[]).map((n,i)=> <div key={i} className="text-white/50">- {n}</div>)}
           </div>
         </div>
       )}
